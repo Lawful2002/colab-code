@@ -1,26 +1,57 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <TopNav 
+      @change-language="changeLang"
+    />
+    <keep-alive>
+    <MonacoEditor
+      :height="height"
+      :width="width"
+      :language="lang"
+      :code="code"
+      :editorOptions="options"
+      :key="lang"    
+    >
+    </MonacoEditor>
+    </keep-alive>
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  margin: 0;
+  overflow: hidden;
 }
 </style>
+
+<script>
+import MonacoEditor from "vue-monaco-editor";
+import TopNav from "./components/layouts/TopNav.vue";
+
+export default {
+  updated() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+  },
+  data() {
+    return {
+      lang: "cpp",
+      code: "//Write Your Code Here",
+      options: {
+        selectOnLineNumbers: true,
+      },
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+  },
+  methods: {
+    changeLang(language) {
+      this.lang = language
+    },
+  },
+  components: {
+    MonacoEditor,
+    TopNav,
+  },
+};
+</script>
