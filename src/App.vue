@@ -1,18 +1,17 @@
 <template>
   <div id="app">
-    <TopNav 
-      @change-language="changeLang"
-    />
+    <TopNav @change-language="changeLang" />
     <keep-alive>
-    <MonacoEditor
-      :height="height"
-      :width="width"
-      :language="lang"
-      :code="code"
-      :editorOptions="options"
-      :key="lang"    
-    >
-    </MonacoEditor>
+      <MonacoEditor
+        :height="height"
+        :width="width"
+        :language="lang"
+        :code="code"
+        :editorOptions="options"
+        :key="lang"
+        @codeChange="onCodeChange"
+      >
+      </MonacoEditor>
     </keep-alive>
   </div>
 </template>
@@ -29,6 +28,17 @@ import MonacoEditor from "vue-monaco-editor";
 import TopNav from "./components/layouts/TopNav.vue";
 
 export default {
+  mounted() {
+    console.log("mounted")
+    if (localStorage.getItem("code")) {
+      this.code = localStorage.getItem("code")
+      this.lang = localStorage.getItem("lang")
+    }
+    setInterval(() => {
+      window.localStorage.setItem("code", this.savedCode)
+      window.localStorage.setItem("lang", this.lang)
+    },10 *1000);
+  },
   updated() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -36,7 +46,8 @@ export default {
   data() {
     return {
       lang: "cpp",
-      code: "//Write Your Code Here",
+      code: "//code here", //initial code
+      savedCode: "",
       options: {
         selectOnLineNumbers: true,
       },
@@ -46,7 +57,11 @@ export default {
   },
   methods: {
     changeLang(language) {
-      this.lang = language
+      this.lang = language;
+      this.code = "//code here"
+    },
+    onCodeChange(editorState) {
+      this.savedCode = editorState.getValue();
     },
   },
   components: {

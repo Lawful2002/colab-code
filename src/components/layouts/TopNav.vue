@@ -41,7 +41,10 @@
 export default {
   emits: ['change-language'],
   mounted() {
-    this.langChange();
+    if(localStorage.getItem('code')){
+      this.$refs.lang.value = localStorage.getItem('lang')
+    }
+    this.langChange()
   },
   data() {
     return {};
