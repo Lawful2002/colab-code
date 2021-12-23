@@ -1,8 +1,8 @@
 <template>
-  <div class="topnav d-sm-flex justify-content-between">
+  <div class="topnav d-flex align-items-center justify-content-between">
     <select
       v-on:change="langChange"
-      class="form-select"
+      class="form-select m-2"
       aria-label="Select language"
       ref="lang"
     >
@@ -12,12 +12,18 @@
       <option value="java">Java</option>
       <option value="csharp">C#</option>
     </select>
-    <div class="action-buttons d-sm-flex justify-content-between">
-      <button class="round btn btn-primary">Upload File</button>
-      <button class="round btn btn-primary">Download</button>
-      <button class="round btn btn-primary">Run</button>
-      <button class="round btn btn-primary">More Options</button>
-    </div>
+    <b-dropdown
+      id="dropdown-1"
+      text="More Options"
+      class="m-2"
+      variant="primary"
+    >
+      <b-dropdown-item disabled>Run Code</b-dropdown-item>
+      <b-dropdown-item disabled>Upload from File</b-dropdown-item>
+      <b-dropdown-item disabled>Download Code</b-dropdown-item>
+      <b-dropdown-item disabled>Collab Mode</b-dropdown-item>
+      <b-dropdown-item @click="clearStore">Clear Cache</b-dropdown-item>
+    </b-dropdown>
   </div>
 </template>
 
@@ -39,20 +45,23 @@
 
 <script>
 export default {
-  emits: ['change-language'],
+  emits: ["change-language"],
   mounted() {
-    if(localStorage.getItem('code')){
-      this.$refs.lang.value = localStorage.getItem('lang')
+    if (localStorage.getItem("code")) {
+      this.$refs.lang.value = localStorage.getItem("lang");
     }
-    this.langChange()
+    this.langChange();
   },
   data() {
     return {};
   },
   methods: {
+    clearStore() {
+      localStorage.clear();
+    },
     langChange() {
       let language = this.$refs.lang.value;
-      this.$emit('change-language', language);
+      this.$emit("change-language", language);
     },
   },
 };

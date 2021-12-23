@@ -10,6 +10,7 @@
         :editorOptions="options"
         :key="lang"
         @codeChange="onCodeChange"
+        @mounted="getEditor"
       >
       </MonacoEditor>
     </keep-alive>
@@ -56,11 +57,15 @@ export default {
     };
   },
   methods: {
+    getEditor(editor){
+      this.editor = editor
+    },
     changeLang(language) {
       this.lang = language;
       this.code = "//code here"
     },
     onCodeChange(editorState) {
+      this.editor = editorState
       this.savedCode = editorState.getValue();
     },
   },
