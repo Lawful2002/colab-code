@@ -33,6 +33,7 @@
         class="round mx-2"
         icon="file-earmark-arrow-down"
         variant="secondary"
+        @click="saveCode"
       ></b-icon>
       <b-icon
         title="Colab Mode"
@@ -82,7 +83,7 @@
 
 <script>
 export default {
-  emits: ["change-language"],
+  emits: ["change-language", "save-code"],
   mounted() {
     if (localStorage.getItem("code")) {
       this.$refs.lang.value = localStorage.getItem("lang");
@@ -93,6 +94,9 @@ export default {
     return {};
   },
   methods: {
+    saveCode() {
+      this.$emit("save-code")
+    },
     clearStore() {
       localStorage.clear();
       console.log('cache cleared')
