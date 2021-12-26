@@ -6,7 +6,7 @@
         :height="height"
         :width="width"
         :language="lang"
-        :code="code"
+        :code="savedCode"
         :editorOptions="options"
         :key="lang"
         @codeChange="onCodeChange"
@@ -53,9 +53,8 @@ export default {
   },
   data() {
     return {
-      lang: "",
-      code: "//code here", //initial code
-      savedCode: "",
+      lang: undefined,
+      savedCode: "//code here",
       options: {
         selectOnLineNumbers: true,
       },
