@@ -27,6 +27,7 @@
         class="round mx-2"
         icon="file-earmark-arrow-up"
         variant="secondary"
+        @click="upload"
       ></b-icon>
       <b-icon
         title="Download Code"
@@ -83,7 +84,7 @@
 
 <script>
 export default {
-  emits: ["change-language", "save-code"],
+  emits: ["change-language", "save-code", "upload"],
   mounted() {
     if (localStorage.getItem("code")) {
       this.$refs.lang.value = localStorage.getItem("lang");
@@ -94,6 +95,9 @@ export default {
     return {};
   },
   methods: {
+    upload(){
+      this.$emit('upload')
+    },
     saveCode() {
       this.$emit("save-code")
     },

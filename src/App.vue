@@ -1,19 +1,20 @@
 <template>
   <div id="app">
-    <TopNav @change-language="changeLang" @save-code="saveCode" />
-    <keep-alive>
-      <MonacoEditor
-        :height="height"
-        :width="width"
-        :language="lang"
-        :code="savedCode"
-        :editorOptions="options"
-        :key="lang"
-        @codeChange="onCodeChange"
-        @mounted="getEditor"
-      >
-      </MonacoEditor>
-    </keep-alive>
+
+    <Modal @close-modal="closeModal" v-if="showModal"></Modal>
+
+    <TopNav @change-language="changeLang" @save-code="saveCode" @upload="openModal"/>
+    <MonacoEditor
+      :height="height"
+      :width="width"
+      :language="lang"
+      :code="savedCode"
+      :editorOptions="options"
+      :key="lang"
+      @codeChange="onCodeChange"
+      @mounted="getEditor"
+    >
+    </MonacoEditor>
   </div>
 </template>
 
@@ -28,14 +29,15 @@ body {
 import MonacoEditor from "vue-monaco-editor";
 import TopNav from "./components/layouts/TopNav.vue";
 import { saveAs } from "file-saver";
-import Extenstions from './constants/fileExt'
+import Extenstions from "./constants/fileExt";
+import Modal from "./components/modals/Modal.vue";
 
 export default {
   mounted() {
     console.log("mounted");
     if (localStorage.getItem("code")) {
       this.code = localStorage.getItem("code");
-      this.lang = localStorage.getItem("lang")
+      this.lang = localStorage.getItem("lang");
       this.savedCode = this.code;
     }
     setInterval(() => {
@@ -43,7 +45,7 @@ export default {
       window.localStorage.setItem("lang", this.lang);
     }, 10 * 1000);
   },
-   unmount() {
+  unmount() {
     window.localStorage.setItem("code", this.savedCode);
     window.localStorage.setItem("lang", this.lang);
   },
@@ -53,6 +55,7 @@ export default {
   },
   data() {
     return {
+      showModal: false,
       lang: undefined,
       savedCode: "//code here",
       options: {
@@ -63,8 +66,14 @@ export default {
     };
   },
   methods: {
+    openModal(){
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
     saveCode() {
-      let ext = Extenstions[this.lang]
+      let ext = Extenstions[this.lang];
       let filename = `colab-code-${Date.now()}.${ext}`;
       const blob = new Blob([this.savedCode]);
       saveAs(blob, filename);
@@ -85,6 +94,7 @@ export default {
   components: {
     MonacoEditor,
     TopNav,
+    Modal,
   },
 };
 </script>
