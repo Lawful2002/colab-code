@@ -4,7 +4,7 @@
       class="outer d-flex flex-column justify-content-around align-items-center"
       v-click-away="closeModal"
     >
-      <div><slot class="heading" name="heading"> Modal Heading </slot></div>
+      <div class="heading"><slot name="heading"> Modal Heading </slot></div>
       <div>
         <slot name="body" class="container"> Modal Body </slot>
       </div>
@@ -33,6 +33,14 @@ export default {
 </script>
 
 <style scoped>
+.footer{
+  display: flex;
+  justify-content: space-between;
+}
+.heading {
+  font-size: 22pt;
+  text-align: center;
+}
 .outer {
   color: white;
   padding: 20px;

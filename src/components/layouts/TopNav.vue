@@ -12,6 +12,9 @@
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="csharp">C#</option>
+        <option value="text">Plain Text</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
       </select>
     </div>
 
@@ -84,7 +87,7 @@
 
 <script>
 export default {
-  emits: ["change-language", "save-code", "upload"],
+  emits: ["change-language", "save-code", "upload", "clear-store"],
   mounted() {
     if (localStorage.getItem("code")) {
       this.$refs.lang.value = localStorage.getItem("lang");
@@ -95,15 +98,14 @@ export default {
     return {};
   },
   methods: {
-    upload(){
-      this.$emit('upload')
+    clearStore(){
+      this.$emit('clear-store')
+    },
+    upload() {
+      this.$emit("upload");
     },
     saveCode() {
-      this.$emit("save-code")
-    },
-    clearStore() {
-      localStorage.clear();
-      console.log('cache cleared')
+      this.$emit("save-code");
     },
     langChange() {
       let language = this.$refs.lang.value;

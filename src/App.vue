@@ -1,9 +1,71 @@
 <template>
   <div id="app">
+    <Modal @close-modal="closeModal" v-if="showModal">
+      <template #heading> Upload Code </template>
+      <template #body>
+        <form>
+          <div>
+            <input
+              class="form-control"
+              type="file"
+              id="formFile"
+              ref="file"
+              accept=".cpp, .cs, .py, .java, .txt, .html, .css, .js"
+            />
+            <div v-show="fileTypeError" class="error mt-2">
+              Please select a valid file!
+            </div>
+          </div>
+        </form>
+      </template>
+      <template #footer>
+        <div
+          class="d-flex flex-row justify-items-center justify-content-between"
+        >
+          <div>
+            <button class="btn-success btn mb-2 mx-5" @click="getFile">
+              Upload
+            </button>
+          </div>
+          <div>
+            <button class="btn-danger btn mx-5" @click="closeModal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </template>
+    </Modal>
 
-    <Modal @close-modal="closeModal" v-if="showModal"></Modal>
+    <Modal @close-modal="closeWarningModal" v-if="showWarningModal">
+      <template #heading> Clear Cache </template>
+      <template #body
+        >This will clear the locally stored code. Are you sure you want to
+        continue?</template
+      >
+      <template #footer>
+        <div
+          class="d-flex flex-row justify-items-center justify-content-between"
+        >
+          <div>
+            <button class="btn-danger btn mb-2 mx-5" @click="clearStore">
+              Clear Cache
+            </button>
+          </div>
+          <div>
+            <button class="btn-primary btn mx-5" @click="closeWarningModal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </template>
+    </Modal>
 
-    <TopNav @change-language="changeLang" @save-code="saveCode" @upload="openModal"/>
+    <TopNav
+      @change-language="changeLang"
+      @save-code="saveCode"
+      @upload="openModal"
+      @clear-store="openWarningModal"
+    />
     <MonacoEditor
       :height="height"
       :width="width"
@@ -24,6 +86,12 @@ body {
   overflow: hidden;
 }
 </style>
+<style scoped>
+.error {
+  color: red;
+  text-align: center;
+}
+</style>
 
 <script>
 import MonacoEditor from "vue-monaco-editor";
@@ -31,6 +99,7 @@ import TopNav from "./components/layouts/TopNav.vue";
 import { saveAs } from "file-saver";
 import Extenstions from "./constants/fileExt";
 import Modal from "./components/modals/Modal.vue";
+import fileTypes from "./constants/extenstions";
 
 export default {
   mounted() {
@@ -43,7 +112,7 @@ export default {
     setInterval(() => {
       window.localStorage.setItem("code", this.savedCode);
       window.localStorage.setItem("lang", this.lang);
-    }, 10 * 1000);
+    }, 5 * 1000);
   },
   unmount() {
     window.localStorage.setItem("code", this.savedCode);
@@ -55,6 +124,8 @@ export default {
   },
   data() {
     return {
+      fileTypeError: false,
+      showWarningModal: false,
       showModal: false,
       lang: undefined,
       savedCode: "//code here",
@@ -66,7 +137,34 @@ export default {
     };
   },
   methods: {
-    openModal(){
+    clearStore() {
+      localStorage.clear();
+      console.log("cache cleared");
+      this.closeWarningModal()
+    },
+    getFile() {
+      const file = this.$refs.file.files[0];
+      const ext = this.$refs.file.files[0].name.split(".")[1];
+      if (!fileTypes.includes(ext)) {
+        this.fileTypeError = true;
+      } else {
+        this.fileTypeError = false;
+        const fr = new FileReader();
+        fr.readAsText(file);
+        const that = this;
+        fr.onload = () => {
+          that.editor.setValue(fr.result);
+          that.closeModal();
+        };
+      }
+    },
+    openWarningModal() {
+      this.showWarningModal = true;
+    },
+    closeWarningModal() {
+      this.showWarningModal = false;
+    },
+    openModal() {
       this.showModal = true;
     },
     closeModal() {

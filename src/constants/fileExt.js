@@ -7,5 +7,10 @@ module.exports = {
     'c': 'c',
     'html': 'html',
     'css': 'css',
-    'java': 'java'
+    'java': 'java',
+
+    'js': 'javascript',
+    'py': 'python',
+    'cs': 'csharp',
+    'txt': 'text',
 }
