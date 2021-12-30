@@ -7,8 +7,9 @@
         aria-label="Select language"
         ref="lang"
       >
-        <option value="cpp" selected>C++</option>
-        <option value="javascript">Javascript</option>
+        <option value="javascript" selected>Javascript</option>
+        <option value="cpp">C++</option>
+        <option value="c">C</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="csharp">C#</option>
@@ -24,6 +25,7 @@
         class="round mx-2"
         icon="play-circle"
         variant="secondary"
+        @click="runCode"        
       ></b-icon>
       <b-icon
         title="Upload Code"
@@ -87,7 +89,7 @@
 
 <script>
 export default {
-  emits: ["change-language", "save-code", "upload", "clear-store"],
+  emits: ["change-language", "save-code", "upload", "clear-store", "run-code"],
   mounted() {
     if (localStorage.getItem("code")) {
       this.$refs.lang.value = localStorage.getItem("lang");
@@ -98,6 +100,9 @@ export default {
     return {};
   },
   methods: {
+    runCode(){
+      this.$emit('run-code')
+    },
     clearStore(){
       this.$emit('clear-store')
     },

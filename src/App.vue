@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Modal @close-modal="closeModal" v-if="showModal">
+    <Modal v-if="showModal">
       <template #heading> Upload Code </template>
       <template #body>
         <form>
@@ -36,11 +36,11 @@
       </template>
     </Modal>
 
-    <Modal @close-modal="closeWarningModal" v-if="showWarningModal">
+    <Modal v-if="showWarningModal">
       <template #heading> Clear Cache </template>
-      <template #body
-        >This will clear the locally stored code. Are you sure you want to
-        continue?</template
+      <template #body>
+        <p>This will clear the locally stored code.</p>
+        <p>Are you sure you want to continue?</p></template
       >
       <template #footer>
         <div
@@ -60,11 +60,53 @@
       </template>
     </Modal>
 
+    <Modal v-if="showRunModal">
+      <template #heading> Run your Code </template>
+      <template #body>
+        <div class="input-group mb-2">
+          <span class="input-group-text">STDIN</span>
+          <textarea class="form-control" aria-label="STDIN" rows="2" v-model="input"></textarea>
+        </div>
+        <div class="input-group">
+          <span class="input-group-text">STDOUT</span>
+          <textarea
+            class="form-control"
+            aria-label="STDOUT"
+            readonly
+            rows="2"
+            v-model="output"
+          ></textarea>
+        </div>
+      </template>
+      <template #footer>
+        <div
+          class="d-flex flex-row justify-items-center justify-content-between"
+        >
+          <div>
+            <button
+              class="btn-success btn mb-2 mx-5"
+              @click="runCode"
+              :disabled="runDisabled"
+              :title="runMessage"
+            >
+              {{ this.runMessage }}
+            </button>
+          </div>
+          <div>
+            <button class="btn-danger btn mx-5" @click="closeRunModal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </template>
+    </Modal>
+
     <TopNav
       @change-language="changeLang"
       @save-code="saveCode"
       @upload="openModal"
       @clear-store="openWarningModal"
+      @run-code="openRunModal"
     />
     <MonacoEditor
       :height="height"
@@ -91,6 +133,9 @@ body {
   color: red;
   text-align: center;
 }
+p {
+  text-align: center;
+}
 </style>
 
 <script>
@@ -100,6 +145,8 @@ import { saveAs } from "file-saver";
 import Extenstions from "./constants/fileExt";
 import Modal from "./components/modals/Modal.vue";
 import fileTypes from "./constants/extenstions";
+import runtimes from "./constants/runtimes";
+import Axios from "axios";
 
 export default {
   mounted() {
@@ -124,6 +171,11 @@ export default {
   },
   data() {
     return {
+      runMessage: "Run",
+      input: "",
+      runDisabled: false,
+      output: undefined,
+      showRunModal: false,
       fileTypeError: false,
       showWarningModal: false,
       showModal: false,
@@ -137,10 +189,43 @@ export default {
     };
   },
   methods: {
+    async runCode() {
+      this.output = "Running....."
+      const body = {
+        language: runtimes[this.lang][0],
+        version: runtimes[this.lang][1],
+        files: [
+          {
+            content: this.savedCode,
+          },
+        ],
+        stdin: this.input,
+        compile_timeout: 10000,
+        run_timeout: 3000,
+        compile_memory_limit: -1,
+        run_memory_limit: -1,
+      };
+
+      Axios.post("https://emkc.org/api/v2/piston/execute", body)
+        .then((res) => {
+          this.output = res.data.run.output;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      
+      this.runDisabled = true;
+      this.runMessage = "Wait"
+      setTimeout(()=>{
+        this.runDisabled = false;
+        this.runMessage = 'Run'
+      }, 5000)
+
+    },
     clearStore() {
       localStorage.clear();
       console.log("cache cleared");
-      this.closeWarningModal()
+      this.closeWarningModal();
     },
     getFile() {
       const file = this.$refs.file.files[0];
@@ -157,6 +242,12 @@ export default {
           that.closeModal();
         };
       }
+    },
+    openRunModal() {
+      this.showRunModal = true;
+    },
+    closeRunModal() {
+      this.showRunModal = false;
     },
     openWarningModal() {
       this.showWarningModal = true;
@@ -183,6 +274,13 @@ export default {
     changeLang(language) {
       this.lang = language;
       this.code = "//code here";
+      if (runtimes[this.lang]) {
+        this.runDisabled = false;
+        this.runMessage = "Run"
+      } else {
+        this.runDisabled = true;
+        this.runMessage = "Unsupported Language"
+      }
     },
     onCodeChange(editorState) {
       this.editor = editorState;
