@@ -10,7 +10,7 @@
               type="file"
               id="formFile"
               ref="file"
-              accept=".cpp, .cs, .py, .java, .txt, .html, .css, .js"
+              accept=".cpp, .cs, .py, .java, .txt, .html, .css, .js, .ts"
             />
             <div v-show="fileTypeError" class="error mt-2">
               Please select a valid file!
@@ -108,17 +108,18 @@
       @clear-store="openWarningModal"
       @run-code="openRunModal"
     />
-    <MonacoEditor
-      :height="height"
-      :width="width"
-      :language="lang"
-      :code="savedCode"
-      :editorOptions="options"
+
+    <VAceEditor
+      v-model:value="savedCode"
+      @init="getEditor"
+      :lang="lang"
+      theme="vibrant_ink"
+      min-lines=100
+      max-lines=2000
       :key="lang"
-      @codeChange="onCodeChange"
-      @mounted="getEditor"
-    >
-    </MonacoEditor>
+      :options="editorOptions"
+    />
+    
   </div>
 </template>
 
@@ -139,7 +140,20 @@ p {
 </style>
 
 <script>
-import MonacoEditor from "vue-monaco-editor";
+import { VAceEditor } from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/theme-vibrant_ink'
+import 'ace-builds/src-noconflict/ext-language_tools';
+
+import 'ace-builds/src-noconflict/mode-typescript'
+import 'ace-builds/src-noconflict/mode-plain_text'
+import 'ace-builds/src-noconflict/mode-javascript'
+import 'ace-builds/src-noconflict/mode-java'
+import 'ace-builds/src-noconflict/mode-c_cpp'
+import 'ace-builds/src-noconflict/mode-python'
+import 'ace-builds/src-noconflict/mode-csharp'
+import 'ace-builds/src-noconflict/mode-html'
+import 'ace-builds/src-noconflict/mode-css'
+
 import TopNav from "./components/layouts/TopNav.vue";
 import { saveAs } from "file-saver";
 import Extenstions from "./constants/fileExt";
@@ -152,9 +166,8 @@ export default {
   mounted() {
     console.log("mounted");
     if (localStorage.getItem("code")) {
-      this.code = localStorage.getItem("code");
+      this.savedCode = localStorage.getItem("code");
       this.lang = localStorage.getItem("lang");
-      this.savedCode = this.code;
     }
     setInterval(() => {
       window.localStorage.setItem("code", this.savedCode);
@@ -180,12 +193,12 @@ export default {
       showWarningModal: false,
       showModal: false,
       lang: undefined,
-      savedCode: "//code here",
-      options: {
-        selectOnLineNumbers: true,
-      },
-      width: window.innerWidth,
-      height: window.innerHeight,
+      savedCode: '',
+      editorOptions: {
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: true
+      }
     };
   },
   methods: {
@@ -288,7 +301,7 @@ export default {
     },
   },
   components: {
-    MonacoEditor,
+    VAceEditor,
     TopNav,
     Modal,
   },

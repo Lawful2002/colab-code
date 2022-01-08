@@ -8,12 +8,12 @@
         ref="lang"
       >
         <option value="javascript" selected>Javascript</option>
-        <option value="cpp">C++</option>
-        <option value="c">C</option>
+        <option value="typescript">Typescript</option>
+        <option value="c_cpp">C++</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="csharp">C#</option>
-        <option value="text">Plain Text</option>
+        <option value="plain_text">Plain Text</option>
         <option value="html">HTML</option>
         <option value="css">CSS</option>
       </select>
