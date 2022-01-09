@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Modal v-if="showModal">
+    <BaseModal v-if="showModal">
       <template #heading> Upload Code </template>
       <template #body>
         <form>
@@ -34,9 +34,9 @@
           </div>
         </div>
       </template>
-    </Modal>
+    </BaseModal>
 
-    <Modal v-if="showWarningModal">
+    <BaseModal v-if="showWarningModal">
       <template #heading> Clear Cache </template>
       <template #body>
         <p>This will clear the locally stored code.</p>
@@ -58,9 +58,9 @@
           </div>
         </div>
       </template>
-    </Modal>
+    </BaseModal>
 
-    <Modal v-if="showRunModal">
+    <BaseModal v-if="showRunModal">
       <template #heading> Run your Code </template>
       <template #body>
         <div class="input-group mb-2">
@@ -99,7 +99,7 @@
           </div>
         </div>
       </template>
-    </Modal>
+    </BaseModal>
 
     <TopNav
       @change-language="changeLang"
@@ -157,7 +157,7 @@ import 'ace-builds/src-noconflict/mode-css'
 import TopNav from "./components/layouts/TopNav.vue";
 import { saveAs } from "file-saver";
 import Extenstions from "./constants/fileExt";
-import Modal from "./components/modals/Modal.vue";
+import BaseModal from "./components/modals/BaseModal.vue";
 import fileTypes from "./constants/extenstions";
 import runtimes from "./constants/runtimes";
 import Axios from "axios";
@@ -303,7 +303,7 @@ export default {
   components: {
     VAceEditor,
     TopNav,
-    Modal,
+    BaseModal,
   },
 };
 </script>
