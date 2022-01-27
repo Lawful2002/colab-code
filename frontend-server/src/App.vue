@@ -161,8 +161,12 @@ import BaseModal from "./components/modals/BaseModal.vue";
 import fileTypes from "./constants/extenstions";
 import runtimes from "./constants/runtimes";
 import Axios from "axios";
+import SocketConnectionService from "@/services/SocketConnectionService.js";
 
 export default {
+  created() {
+    SocketConnectionService.createConnection();
+  },
   mounted() {
     console.log("mounted");
     if (localStorage.getItem("code")) {
