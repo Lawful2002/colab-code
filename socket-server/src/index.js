@@ -1,10 +1,17 @@
 const express = require('express');
 const socketIO = require('socket.io');
 const { createServer } = require('http');
-const {joinRoom} = require("./utils/utils");
 
 const app = express();
 const server = createServer(app);
+
+function joinRoom (socket, newRoom) {
+    let prevRoom = Object.keys(socket.rooms)[1];
+    socket.leave(prevRoom);
+    socket.join(newRoom);
+    socket.emit('roomJoined', newRoom);
+    console.log("joined room");
+}
 
 const io = socketIO(server, {
     cors: {
@@ -13,11 +20,24 @@ const io = socketIO(server, {
 })
 
 io.on('connection', (socket)=>{
-    let currentRoom = Object.keys(socket.rooms)[0]; //socket.id
     console.log("someone joined");
-    socket.on('createRoom', (roomName, callback)=>{
+
+    socket.on('createRoom', roomName=>{
+        console.log(roomName);
         joinRoom(socket, roomName);
-        callback(roomName); // remove this if not needed
+    });
+
+    socket.on('joinRoom', (roomName)=>{
+        joinRoom(socket, roomName);
+    });
+
+    socket.on('leaveRoom', (roomName)=>{
+        socket.leave(roomName);
+    });
+
+    socket.on('sendData', data=>{
+        console.log(Array.from(socket.rooms)[1]);
+        socket.to(Array.from(socket.rooms)[1]).emit('dataChange', data); //change to io.to(..).. if the current setup causes issues
     })
 })
 
