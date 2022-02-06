@@ -101,12 +101,37 @@
       </template>
     </BaseModal>
 
+    <BaseModal v-if="showColabModal">
+      <template #heading>Colab Mode</template>
+      <template #body>
+        <div>
+          <span>Create a Room: </span>
+          <span><button @click="createRoom" class="btn btn-primary">Create Room</button></span>
+        </div>
+        <div>
+          Room ID: {{roomID}}
+        </div>
+        <div>
+          <div>Create a Room: </div>
+          <div>
+            <span>Join Room: </span>
+            <input type="text" v-model="customRoomID">
+            <button @click="joinRoom" class="btn btn-success">Join Room</button>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <button @click="closeColabModal" class="btn btn-danger">Cancel</button>
+      </template>
+    </BaseModal>
+
     <TopNav
       @change-language="changeLang"
       @save-code="saveCode"
       @upload="openModal"
       @clear-store="openWarningModal"
       @run-code="openRunModal"
+      @colab="openColabModal"
     />
 
     <VAceEditor
@@ -118,6 +143,7 @@
       max-lines=2000
       :key="lang"
       :options="editorOptions"
+      v-on:change="sendData"
     />
     
   </div>
@@ -156,19 +182,24 @@ import 'ace-builds/src-noconflict/mode-css'
 
 import TopNav from "./components/layouts/TopNav.vue";
 import { saveAs } from "file-saver";
-import Extenstions from "./constants/fileExt";
+import Extensions from "./constants/fileExt";
 import BaseModal from "./components/modals/BaseModal.vue";
 import fileTypes from "./constants/extenstions";
 import runtimes from "./constants/runtimes";
 import Axios from "axios";
-import SocketConnectionService from "@/services/SocketConnectionService.js";
+import SocketConnectionService from "@/services/socket-connection-service.js";
+import {nanoid} from "nanoid";
 
 export default {
   created() {
     SocketConnectionService.createConnection();
   },
   mounted() {
-    console.log("mounted");
+    console.log(SocketConnectionService.socket);
+    SocketConnectionService.socket.on('dataChange', data => {
+      console.log("data received");
+      this.savedCode = data;
+    })
     if (localStorage.getItem("code")) {
       this.savedCode = localStorage.getItem("code");
       this.lang = localStorage.getItem("lang");
@@ -177,22 +208,23 @@ export default {
       window.localStorage.setItem("code", this.savedCode);
       window.localStorage.setItem("lang", this.lang);
     }, 5 * 1000);
-  },
+},
+
   unmount() {
     window.localStorage.setItem("code", this.savedCode);
     window.localStorage.setItem("lang", this.lang);
   },
-  updated() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-  },
+
   data() {
     return {
+      customRoomID: '',
+      roomID: '',
       runMessage: "Run",
       input: "",
       runDisabled: false,
       output: undefined,
       showRunModal: false,
+      showColabModal: false,
       fileTypeError: false,
       showWarningModal: false,
       showModal: false,
@@ -206,6 +238,25 @@ export default {
     };
   },
   methods: {
+    sendData() {
+      console.log("data");
+      SocketConnectionService.sendData(this.savedCode);
+    },
+    debug() {
+      console.log("changed");
+    },
+    joinRoom() {
+      SocketConnectionService.joinRoom(this.customRoomID);
+    },
+
+    createRoom() {
+      this.roomID = nanoid(10);
+      SocketConnectionService.createRoom(this.roomID);
+      SocketConnectionService.socket.on('dataChange', data => {
+        this.savedCode = data;
+      })
+    },
+
     async runCode() {
       this.output = "Running....."
       const body = {
@@ -239,11 +290,13 @@ export default {
       }, 5000)
 
     },
+
     clearStore() {
       localStorage.clear();
       console.log("cache cleared");
       this.closeWarningModal();
     },
+
     getFile() {
       const file = this.$refs.file.files[0];
       const ext = this.$refs.file.files[0].name.split(".")[1];
@@ -260,34 +313,51 @@ export default {
         };
       }
     },
+
     openRunModal() {
       this.showRunModal = true;
     },
+
     closeRunModal() {
       this.showRunModal = false;
     },
+
+    openColabModal() {
+      this.showColabModal = true;
+    },
+
+    closeColabModal() {
+      this.showColabModal = false;
+    },
+
     openWarningModal() {
       this.showWarningModal = true;
     },
+
     closeWarningModal() {
       this.showWarningModal = false;
     },
+
     openModal() {
       this.showModal = true;
     },
+
     closeModal() {
       this.showModal = false;
     },
+
     saveCode() {
-      let ext = Extenstions[this.lang];
+      let ext = Extensions[this.lang];
       let filename = `colab-code-${Date.now()}.${ext}`;
       const blob = new Blob([this.savedCode]);
       saveAs(blob, filename);
       alert("Code Saved!");
     },
+
     getEditor(editor) {
       this.editor = editor;
     },
+
     changeLang(language) {
       this.lang = language;
       this.code = "//code here";
@@ -298,10 +368,6 @@ export default {
         this.runDisabled = true;
         this.runMessage = "Unsupported Language"
       }
-    },
-    onCodeChange(editorState) {
-      this.editor = editorState;
-      this.savedCode = editorState.getValue();
     },
   },
   components: {

@@ -46,6 +46,7 @@
         class="round mx-2"
         icon="people-fill"
         variant="secondary"
+        @click="colabModal"
       ></b-icon>
       <b-icon
         title="Clear Cache"
@@ -89,7 +90,7 @@
 
 <script>
 export default {
-  emits: ["change-language", "save-code", "upload", "clear-store", "run-code"],
+  emits: ["change-language", "save-code", "upload", "clear-store", "run-code", "colab"],
   mounted() {
     if (localStorage.getItem("code")) {
       this.$refs.lang.value = localStorage.getItem("lang");
@@ -116,6 +117,9 @@ export default {
       let language = this.$refs.lang.value;
       this.$emit("change-language", language);
     },
+    colabModal() {
+      this.$emit('colab');
+    }
   },
 };
 </script>
