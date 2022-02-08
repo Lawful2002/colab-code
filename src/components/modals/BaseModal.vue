@@ -55,8 +55,8 @@ export default {
 }
 .full {
   position: fixed;
-  background-color: #001a3893;
-  z-index: 1000;
+  background-color: red;
+  z-index: 10;
   width: 100vw;
   height: 100vh;
 }

@@ -9,17 +9,13 @@ class SocketConnectionService {
     constructor() {}
 
     createConnection() {
-        this.socket = io('http://localhost:3000'); // use env variables
+        this.socket = io('https://colab-code-socket-server.herokuapp.com/'); // use env variables
         this.isConnected = true;
     }
 
     breakConnection() {
         this.socket.close();
         this.isConnected = false;
-    }
-
-    roomAction(roomName){
-        console.log(roomName);
     }
 
     createRoom(roomId) {
@@ -30,6 +26,7 @@ class SocketConnectionService {
 
     joinRoom(roomName) {
         this.socket.emit('joinRoom', roomName, this.roomAction);
+        this.currentRoom = roomName;
     }
 
     sendData(data) {
@@ -37,10 +34,9 @@ class SocketConnectionService {
     }
 
     leaveRoom(room){
-        this.socket.emit('leaveRoom', room, ()=>{
-            console.log("left room");
-            this.isConnectedToRoom = false;
-        })
+        this.socket.emit('leaveRoom', room);
+        this.isConnectedToRoom = false;
+        this.currentRoom = undefined;
     }
 }
 

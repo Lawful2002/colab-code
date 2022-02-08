@@ -1,129 +1,124 @@
-<template>
+<template class="base">
   <div id="app">
-    <BaseModal v-if="showModal">
-      <template #heading> Upload Code </template>
-      <template #body>
-        <form>
-          <div>
-            <input
-              class="form-control"
-              type="file"
-              id="formFile"
-              ref="file"
-              accept=".cpp, .cs, .py, .java, .txt, .html, .css, .js, .ts"
-            />
-            <div v-show="fileTypeError" class="error mt-2">
-              Please select a valid file!
+    <teleport to="body">
+      <BaseModal v-if="showModal">
+        <template #heading> Upload Code </template>
+        <template #body>
+          <form>
+            <div>
+              <input
+                  class="form-control"
+                  type="file"
+                  id="formFile"
+                  ref="file"
+                  accept=".cpp, .cs, .py, .java, .txt, .html, .css, .js, .ts"
+              />
+              <div v-show="fileTypeError" class="error mt-2">
+                Please select a valid file!
+              </div>
+            </div>
+          </form>
+        </template>
+        <template #footer>
+          <div
+              class="d-flex flex-row justify-items-center justify-content-between"
+          >
+            <div>
+              <button class="btn-success btn mb-2 mx-5" @click="getFile">
+                Upload
+              </button>
+            </div>
+            <div>
+              <button class="btn-danger btn mx-5" @click="closeModal">
+                Cancel
+              </button>
             </div>
           </div>
-        </form>
-      </template>
-      <template #footer>
-        <div
-          class="d-flex flex-row justify-items-center justify-content-between"
+        </template>
+      </BaseModal>
+      <BaseModal v-if="showWarningModal">
+        <template #heading> Clear Cache </template>
+        <template #body>
+          <p>This will clear the locally stored code.</p>
+          <p>Are you sure you want to continue?</p></template
         >
-          <div>
-            <button class="btn-success btn mb-2 mx-5" @click="getFile">
-              Upload
-            </button>
+        <template #footer>
+          <div
+              class="d-flex flex-row justify-items-center justify-content-between"
+          >
+            <div>
+              <button class="btn-danger btn mb-2 mx-5" @click="clearStore">
+                Clear Cache
+              </button>
+            </div>
+            <div>
+              <button class="btn-primary btn mx-5" @click="closeWarningModal">
+                Cancel
+              </button>
+            </div>
           </div>
-          <div>
-            <button class="btn-danger btn mx-5" @click="closeModal">
-              Cancel
-            </button>
+        </template>
+      </BaseModal>
+      <BaseModal v-if="showRunModal">
+        <template #heading> Run your Code </template>
+        <template #body>
+          <div class="input-group mb-2">
+            <span class="input-group-text">STDIN</span>
+            <textarea class="form-control" aria-label="STDIN" rows="2" v-model="input"></textarea>
           </div>
-        </div>
-      </template>
-    </BaseModal>
-
-    <BaseModal v-if="showWarningModal">
-      <template #heading> Clear Cache </template>
-      <template #body>
-        <p>This will clear the locally stored code.</p>
-        <p>Are you sure you want to continue?</p></template
-      >
-      <template #footer>
-        <div
-          class="d-flex flex-row justify-items-center justify-content-between"
-        >
-          <div>
-            <button class="btn-danger btn mb-2 mx-5" @click="clearStore">
-              Clear Cache
-            </button>
+          <div class="input-group">
+            <span class="input-group-text">STDOUT</span>
+            <textarea
+                class="form-control"
+                aria-label="STDOUT"
+                readonly
+                rows="2"
+                v-model="output"
+            ></textarea>
           </div>
-          <div>
-            <button class="btn-primary btn mx-5" @click="closeWarningModal">
-              Cancel
-            </button>
+        </template>
+        <template #footer>
+          <div
+              class="d-flex flex-row justify-items-center justify-content-between"
+          >
+            <div>
+              <button
+                  class="btn-success btn mb-2 mx-5"
+                  @click="runCode"
+                  :disabled="runDisabled"
+                  :title="runMessage"
+              >
+                {{ this.runMessage }}
+              </button>
+            </div>
+            <div>
+              <button class="btn-danger btn mx-5" @click="closeRunModal">
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
-      </template>
-    </BaseModal>
-
-    <BaseModal v-if="showRunModal">
-      <template #heading> Run your Code </template>
-      <template #body>
-        <div class="input-group mb-2">
-          <span class="input-group-text">STDIN</span>
-          <textarea class="form-control" aria-label="STDIN" rows="2" v-model="input"></textarea>
-        </div>
-        <div class="input-group">
-          <span class="input-group-text">STDOUT</span>
-          <textarea
-            class="form-control"
-            aria-label="STDOUT"
-            readonly
-            rows="2"
-            v-model="output"
-          ></textarea>
-        </div>
-      </template>
-      <template #footer>
-        <div
-          class="d-flex flex-row justify-items-center justify-content-between"
-        >
-          <div>
-            <button
-              class="btn-success btn mb-2 mx-5"
-              @click="runCode"
-              :disabled="runDisabled"
-              :title="runMessage"
-            >
-              {{ this.runMessage }}
-            </button>
+        </template>
+      </BaseModal>
+      <BaseModal v-if="showColabModal">
+        <template #heading>Colab Mode</template>
+        <template #body>
+          <form class="input-group mb-4" @submit.prevent="joinRoom">
+            <input type="text" class="form-control" placeholder="Join Room!" v-model="customRoomID">
+            <button @click="joinRoom" class="btn btn-primary" type="button">Join This Room!</button>
+          </form>
+          <form class="input-group mb-4" @submit.prevent="createRoom">
+            <button class="btn btn-success">Create A Room!</button>
+            <input type="text" class="form-control" placeholder="Your Room" readonly v-model="roomID">
+            <button type="reset" @click="leaveRoom" class="btn btn-warning" :disabled="!isConnectedToRoom">Leave The Room!</button>
+          </form>
+          <div class="d-sm-flex">
           </div>
-          <div>
-            <button class="btn-danger btn mx-5" @click="closeRunModal">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </template>
-    </BaseModal>
-
-    <BaseModal v-if="showColabModal">
-      <template #heading>Colab Mode</template>
-      <template #body>
-        <div>
-          <span>Create a Room: </span>
-          <span><button @click="createRoom" class="btn btn-primary">Create Room</button></span>
-        </div>
-        <div>
-          Room ID: {{roomID}}
-        </div>
-        <div>
-          <div>Create a Room: </div>
-          <div>
-            <span>Join Room: </span>
-            <input type="text" v-model="customRoomID">
-            <button @click="joinRoom" class="btn btn-success">Join Room</button>
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <button @click="closeColabModal" class="btn btn-danger">Cancel</button>
-      </template>
-    </BaseModal>
+        </template>
+        <template #footer>
+          <button @click="closeColabModal" class="btn btn-danger">Cancel</button>
+        </template>
+      </BaseModal>
+    </teleport>
 
     <TopNav
       @change-language="changeLang"
@@ -156,6 +151,9 @@ body {
 }
 </style>
 <style scoped>
+.base {
+  z-index: 0;
+}
 .error {
   color: red;
   text-align: center;
@@ -189,6 +187,12 @@ import runtimes from "./constants/runtimes";
 import Axios from "axios";
 import SocketConnectionService from "@/services/socket-connection-service.js";
 import {nanoid} from "nanoid";
+import {debounce} from "lodash";
+
+const deb_function = debounce((value)=>{
+  SocketConnectionService.sendData(value);
+  console.log('data sent');
+}, 1000);
 
 export default {
   created() {
@@ -197,8 +201,12 @@ export default {
   mounted() {
     console.log(SocketConnectionService.socket);
     SocketConnectionService.socket.on('dataChange', data => {
+      let pos = this.editor.getCursorPosition();
       console.log("data received");
+      console.log(this.editor);
       this.savedCode = data;
+      this.sendData(pos);
+
     })
     if (localStorage.getItem("code")) {
       this.savedCode = localStorage.getItem("code");
@@ -219,6 +227,7 @@ export default {
     return {
       customRoomID: '',
       roomID: '',
+      isConnectedToRoom: false,
       runMessage: "Run",
       input: "",
       runDisabled: false,
@@ -230,6 +239,7 @@ export default {
       showModal: false,
       lang: undefined,
       savedCode: '',
+      editor: undefined,
       editorOptions: {
         enableBasicAutocompletion: true,
         enableLiveAutocompletion: true,
@@ -238,15 +248,30 @@ export default {
     };
   },
   methods: {
-    sendData() {
-      console.log("data");
-      SocketConnectionService.sendData(this.savedCode);
+    sendData(pos) {
+      if (pos === undefined) {
+        pos = this.editor.getCursorPosition();
+      }
+      this.editor.gotoLine(pos.row, pos.column, false);
+      deb_function(this.savedCode);
     },
+
     debug() {
       console.log("changed");
     },
+
     joinRoom() {
       SocketConnectionService.joinRoom(this.customRoomID);
+      this.isConnectedToRoom = true;
+      this.roomID = this.customRoomID;
+      this.closeColabModal();
+    },
+
+    leaveRoom(){
+      SocketConnectionService.leaveRoom(this.roomID);
+      this.isConnectedToRoom = false;
+      this.closeColabModal();
+      this.roomID = '';
     },
 
     createRoom() {
@@ -254,7 +279,8 @@ export default {
       SocketConnectionService.createRoom(this.roomID);
       SocketConnectionService.socket.on('dataChange', data => {
         this.savedCode = data;
-      })
+      });
+      this.isConnectedToRoom = true;
     },
 
     async runCode() {
@@ -351,7 +377,6 @@ export default {
       let filename = `colab-code-${Date.now()}.${ext}`;
       const blob = new Blob([this.savedCode]);
       saveAs(blob, filename);
-      alert("Code Saved!");
     },
 
     getEditor(editor) {
