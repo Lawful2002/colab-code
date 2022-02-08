@@ -201,11 +201,9 @@ export default {
   mounted() {
     console.log(SocketConnectionService.socket);
     SocketConnectionService.socket.on('dataChange', data => {
-      let pos = this.editor.getCursorPosition();
       console.log("data received");
       console.log(this.editor);
       this.savedCode = data;
-      this.sendData(pos);
 
     })
     if (localStorage.getItem("code")) {
@@ -248,11 +246,7 @@ export default {
     };
   },
   methods: {
-    sendData(pos) {
-      if (pos === undefined) {
-        pos = this.editor.getCursorPosition();
-      }
-      this.editor.gotoLine(pos.row, pos.column, false);
+    sendData() {
       deb_function(this.savedCode);
     },
 
