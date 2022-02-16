@@ -17,7 +17,7 @@
     "lodash": "^4.17.21",
     "nanoid": "^3.2.0",
     "socket.io-client": "^4.4.1",
-    "vue": "^3.2.29",
+    "vue": "^3.2.31",
     "vue3-ace-editor": "^2.2.2",
     "vue3-click-away": "^1.2.1"
   },
