@@ -1,6 +1,6 @@
 # colab-code
 
-An feature rich online editor based on `ace-editor` supporting multiple programming languages and provides a way to code in real-time with your friends.
+An feature rich online editor based on `ace-editor` supporting multiple programming languages and providing a way to code in real-time with your friends.
 
 ## Project setup
 ```
