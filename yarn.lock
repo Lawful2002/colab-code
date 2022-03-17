@@ -2318,13 +2318,12 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.npm.taobao.org/boolbase/download/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bootstrap-vue-3@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/bootstrap-vue-3/-/bootstrap-vue-3-0.1.0.tgz#363dd24d4f8109eb341ce54758fb5bc02d5405db"
-  integrity sha512-9u/S1qLFMppKdJ15mF/oi2FMj3XRy1ikNizWIobdxM3bhP4gMyo432CsCjtyNaB5jWHTZX+8y3Ylvvk4MQQGcw==
+bootstrap-vue-3@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/bootstrap-vue-3/-/bootstrap-vue-3-0.1.8.tgz#bf1d8a317eba0013f148ba4d09c6610497340f5c"
+  integrity sha512-MIsWALS6YPiH7hVa6QFN1CrOircCX18UklhD9efnxaN93vUtA759kdgFb9+m2m2NDPSjTXTxGkhOWIpCpIhPKQ==
   dependencies:
-    bootstrap "^5.1.3"
-    core-js "^3.6.5"
+    core-js "3.x.x"
 
 bootstrap@^5.1.3:
   version "5.1.3"
@@ -3015,10 +3014,10 @@ core-js-compat@^3.18.0, core-js-compat@^3.19.1, core-js-compat@^3.6.5:
     browserslist "^4.19.1"
     semver "7.0.0"
 
-core-js@^3.21.0, core-js@^3.6.5:
-  version "3.21.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.21.0.tgz#f479dbfc3dffb035a0827602dd056839a774aa71"
-  integrity sha512-YUdI3fFu4TF/2WykQ2xzSiTQdldLB4KVuL9WeAy5XONZYt5Cun/fpQvctoKbCgvPhmzADeesTk/j2Rdx77AcKQ==
+core-js@3.x.x, core-js@^3.21.0, core-js@^3.6.5:
+  version "3.21.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.21.1.tgz#f2e0ddc1fc43da6f904706e8e955bc19d06a0d94"
+  integrity sha512-FRq5b/VMrWlrmCzwRrpDYNxyHP9BcAZC+xHJaqTgIE5091ZV1NTmyh0sGOg5XqpnHvR0svdy0sv1gWA1zmhxig==
 
 core-util-is@1.0.2:
   version "1.0.2"
