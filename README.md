@@ -2,6 +2,9 @@
 
 An feature rich online editor based on `ace-editor` supporting multiple programming languages and providing a way to code in real-time with your friends.
 
+## Server
+The server can be found [here](https://github.com/Lawful2002/colab-code-socket-server).
+
 ## Project setup
 ```
 yarn install
